@@ -1,0 +1,25 @@
+@{
+  Layout = "_Layout";
+}
+
+@using SweetTreats.ViewModels
+@model RegisterViewModel
+
+<h2>Register a new user</h2>
+<hr>
+
+@using (Html.BeginForm("Register", "Account"))
+{
+  @Html.LabelFor(model => model.Email)
+  @Html.TextBoxFor(model => model.Email)
+
+  @Html.LabelFor(model => model.Password)
+  @Html.TextBoxFor(model => model.Password)
+
+  @Html.LabelFor(model => model.ConfirmPassword)
+  @Html.TextBoxFor(model => model.ConfirmPassword)
+
+  <input type="submit" value="Register" />
+}
+
+<p>@Html.ActionLink("Home", "Index", "Home")</p>
