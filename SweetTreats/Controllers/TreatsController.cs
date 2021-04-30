@@ -54,7 +54,11 @@ namespace SweetTreats.Controllers
 
     public ActionResult Edit(int id)
     {
-      Treat thisTreat = _db.Treats.FirstOrDefault(treat => treat.TreatId == id);
+      Treat thisTreat = _db.Treats
+        .Include(treat => treat.Flavors)
+          .ThenInclude(join => join.Flavor)
+        .FirstOrDefault(treat => treat.TreatId == id);
+      ViewBag.FlavorId = new SelectList(_db.Flavors, "FlavorId", "Name");
       return View(thisTreat);
     }
 
@@ -64,6 +68,38 @@ namespace SweetTreats.Controllers
       _db.Entry(treat).State = EntityState.Modified;
       _db.SaveChanges();
       return RedirectToAction("Index");
+    }
+
+    [HttpPost]
+    public ActionResult AddFlavor(Treat treat, int FlavorId)
+    {
+      bool unique = true;
+      List<FlavorTreat> flavorList = _db.FlavorTreat
+        .Where(i => i.TreatId == treat.TreatId).ToList();
+      
+      foreach(FlavorTreat flavorTreat in flavorList)
+      {
+        if(flavorTreat.FlavorId == FlavorId)
+        {
+          unique = false;
+        }
+      }
+
+      if(FlavorId != 0 && unique)
+      {
+        _db.FlavorTreat.Add(new FlavorTreat() { FlavorId = FlavorId, TreatId = treat.TreatId });
+        _db.SaveChanges();
+      }
+      return RedirectToAction("Edit", new { id = treat.TreatId });
+    }
+
+    [HttpPost]
+    public ActionResult DeleteFlavor(int joinId)
+    {
+      FlavorTreat joinEntry = _db.FlavorTreat.FirstOrDefault(entry => entry.FlavorTreatId == joinId);
+      _db.FlavorTreat.Remove(joinEntry);
+      _db.SaveChanges();
+      return RedirectToAction("Edit", new { id = joinEntry.TreatId });
     }
   }
 }
