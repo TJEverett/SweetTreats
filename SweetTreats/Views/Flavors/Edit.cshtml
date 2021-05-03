@@ -18,4 +18,34 @@
   <input type="submit" value="Save" />
 }
 
+<h4>Treats:</h4>
+@if(@Model.Treats.Count == 0)
+{
+  <p>This Flavor has no treats</p>
+}
+else
+{
+  <ul>
+    @foreach(var join in Model.Treats)
+    {
+      <li>@join.Treat.Name</li>
+      @using (Html.BeginForm("DeleteTreat", "Flavors"))
+      {
+        @Html.Hidden("joinId", @join.FlavorTreatId)
+        <input type="submit" value="Delete" />
+      }
+    }
+  </ul>
+}
+
+@using (Html.BeginForm("AddTreat", "Flavors"))
+{
+  @Html.HiddenFor(model => model.FlavorId)
+
+  @Html.Label("Add this Treat?")
+  @Html.DropDownList("TreatId")
+
+  <input type="submit" value="Add" />
+}
+
 <p>@Html.ActionLink("Back to List", "Index")</p>
